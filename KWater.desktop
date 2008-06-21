@@ -1,0 +1,24 @@
+[Desktop Entry]
+Exec=kwater.kss
+Icon=kscreensaver
+Type=Service
+X-KDE-ServiceTypes=ScreenSaver
+Actions=Setup;InWindow;Root;
+X-KDE-Category=Desktop Distortions
+X-KDE-Type=ManipulateScreen
+Name=Water
+
+[Desktop Action Setup]
+Exec=kwater.kss -setup
+Name=Setup...
+Icon=kscreensaver
+
+[Desktop Action InWindow]
+Exec=kwater.kss -window-id %w
+Name=Display in Specified Window
+NoDisplay=true
+
+[Desktop Action Root]
+Exec=kwater.kss -root
+Name=Display in Root Window
+NoDisplay=true
