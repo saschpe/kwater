@@ -68,7 +68,7 @@ void KWaterScreenSaver::resizeEvent(QResizeEvent *event)
 void KWaterScreenSaver::paintEvent(QPaintEvent * /*event*/)
 {
 	QPainter painter(this);
-	painter.drawPixmap(rect(), m_backgroundPixmap);
+	//painter.drawPixmap(rect(), m_backgroundPixmap);
 	painter.drawImage(rect(), *m_oldImg);
 	painter.drawText(rect(), Qt::AlignCenter, "Water Screensaver");
 }
@@ -76,8 +76,15 @@ void KWaterScreenSaver::paintEvent(QPaintEvent * /*event*/)
 void KWaterScreenSaver::mouseMoveEvent(QMouseEvent *event)
 {
 	if (event->buttons() & Qt::LeftButton) {
-		kDebug() << "Mouse drag at" << event->x() << event->y();
+		m_curImg->setPixel(event->x() + 1, event->y() + 1, 255);
+		m_curImg->setPixel(event->x() + 1, event->y(), 255);
+		m_curImg->setPixel(event->x() + 1, event->y() - 1, 255);
+		m_curImg->setPixel(event->x(), event->y() + 1, 255);
 		m_curImg->setPixel(event->x(), event->y(), 255);
+		m_curImg->setPixel(event->x(), event->y() - 1, 255);
+		m_curImg->setPixel(event->x() - 1, event->y() + 1, 255);
+		m_curImg->setPixel(event->x() - 1, event->y(), 255);
+		m_curImg->setPixel(event->x() - 1, event->y() - 1, 255);
 	}
 }
 
@@ -88,10 +95,9 @@ void KWaterScreenSaver::timeout()
 			int value = (m_oldImg->pixelIndex(x, y - 1) + 
 					m_oldImg->pixelIndex(x, y + 1) + 
 					m_oldImg->pixelIndex(x - 1, y) + 
-					m_oldImg->pixelIndex(x + 1, y)) / 2 - m_oldImg->pixelIndex(x, y);
-			//kDebug() << "Value" << value << "X:" << x << "Y:" << y;
+					m_oldImg->pixelIndex(x + 1, y)) / 2 - m_curImg->pixelIndex(x, y);
+			value -= value >> 4;	// Apply damp factor
 			m_curImg->setPixel(x, y, value);
-			m_curImg->setPixel(x, y, m_curImg->pixelIndex(x, y) - m_curImg->pixelIndex(x, y) >> 4); // Apply damping
 		}
 	}
 
@@ -130,14 +136,14 @@ void KWaterSetup::readSettings()
 }
 
 //----------------------------------------------------------------------------
-// libkscreensaver interface
+// libkscreensaver interface implementation
 //----------------------------------------------------------------------------
 
 class KWaterScreenSaverInterface : public KScreenSaverInterface
 {
 public:
 	virtual KAboutData *aboutData() {
-		return new KAboutData("kwater.kss", 0, ki18n("Water"), "0.1", ki18n("Water"));
+		return new KAboutData("kwater.kss", 0, ki18n("Water"), "0.1", ki18n("Water Screensaver"), KAboutData::License_GPL);
 	}
 	
 	virtual KScreenSaver *create(WId id) {
