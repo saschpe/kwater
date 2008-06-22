@@ -76,6 +76,7 @@ void KWaterScreenSaver::paintEvent(QPaintEvent * /*event*/)
 void KWaterScreenSaver::mouseMoveEvent(QMouseEvent *event)
 {
 	if (event->buttons() & Qt::LeftButton) {
+		//TODO: Draw a circle with QPainter
 		m_curImg->setPixel(event->x() + 1, event->y() + 1, 255);
 		m_curImg->setPixel(event->x() + 1, event->y(), 255);
 		m_curImg->setPixel(event->x() + 1, event->y() - 1, 255);
@@ -96,11 +97,10 @@ void KWaterScreenSaver::timeout()
 					m_oldImg->pixelIndex(x, y + 1) + 
 					m_oldImg->pixelIndex(x - 1, y) + 
 					m_oldImg->pixelIndex(x + 1, y)) / 2 - m_curImg->pixelIndex(x, y);
-			value -= value >> 4;	// Apply damp factor
+			value -= value >> 3;	// Apply damp factor
 			m_curImg->setPixel(x, y, value);
 		}
 	}
-
 	update();
 	// Flip the pointer to the current water pixmap
 	QImage *tmp = m_curImg;
