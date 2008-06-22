@@ -23,12 +23,12 @@
  */
 
 /** @file
- * This file is part of KWater Screen Saver.
+ * This file is part of the KDE Water screensaver.
  *
  * @author Sascha Peilicke <sasch.pe@gmx.de>
  */
-#ifndef KWATERSCREENSAVER_H
-#define KWATERSCREENSAVER_H
+#ifndef KWATER_H
+#define KWATER_H
 
 #include <QTimer>
 #include <QPixmap>
@@ -63,10 +63,10 @@ private:
 	QTimer m_timer;					///< The animation timer
 	QPixmap m_desktopPixmap;		///< Stores the current desktop as pixmap
 	QPixmap m_backgroundPixmap;		///< Scaled desktop pixmap
-	QImage m_waterImage1;
-	QImage m_waterImage2;
-	QImage* m_curImg;
-	QImage* m_oldImg;
+	QImage m_waterImage1;			///< Used for the water algorithm
+	QImage m_waterImage2;			///< Used for the water algorithm
+	QImage* m_curImg;				///<
+	QImage* m_oldImg;				///<
 };
 
 /**

@@ -23,7 +23,7 @@
  */
 
 /** @file
- * This file is part of KWater Screen Saver.
+ * This file is part of KDE Water screensaver.
  *
  * @author Sascha Peilicke <sasch.pe@gmx.de>
  */
