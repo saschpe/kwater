@@ -52,9 +52,9 @@ public:
 protected:
 	void resizeEvent(QResizeEvent *event);
 	void paintEvent(QPaintEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
 
 private slots:
-	void initialize();
 	void timeout();
 
 private:
@@ -63,8 +63,10 @@ private:
 	QTimer m_timer;					///< The animation timer
 	QPixmap m_desktopPixmap;		///< Stores the current desktop as pixmap
 	QPixmap m_backgroundPixmap;		///< Scaled desktop pixmap
-	QImage m_waterImages[2];		///< Water rendering pixmaps
-	int m_currentWaterImage;		///< Either 0 or 1
+	QImage m_waterImage1;
+	QImage m_waterImage2;
+	QImage* m_curImg;
+	QImage* m_oldImg;
 };
 
 /**

@@ -38,15 +38,19 @@
 KWaterScreenSaver::KWaterScreenSaver(WId id)
 	: KScreenSaver(id)
 	, m_desktopPixmap(QPixmap::grabWindow(KApplication::desktop()->winId()))
-	, m_currentWaterImage(0)
+	, m_waterImage1(QImage(size(), QImage::Format_Indexed8))
+	, m_waterImage2(QImage(size(), QImage::Format_Indexed8))
 {
-	m_waterImages[0] = QImage(size(), QImage::Format_Indexed8);
-	m_waterImages[1] = QImage(size(), QImage::Format_Indexed8);
+	m_curImg = &m_waterImage1;
+	m_oldImg = &m_waterImage2;
+	for (int i = 0; i < 255; i++) {
+		m_curImg->setColor(i, qGray(i, i, i));
+		m_oldImg->setColor(i, qGray(i, i, i));
+	}
 
 	readSettings();
-	initialize();
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
-	m_timer.start(400);
+	m_timer.start(200);	// 40 -> 25 FPS
 }
 
 KWaterScreenSaver::~KWaterScreenSaver()
@@ -57,41 +61,45 @@ KWaterScreenSaver::~KWaterScreenSaver()
 void KWaterScreenSaver::resizeEvent(QResizeEvent *event)
 {
 	m_backgroundPixmap = m_desktopPixmap.scaled(event->size());
-	m_waterImages[0] = m_waterImages[0].scaled(event->size());
-	m_waterImages[1] = m_waterImages[1].scaled(event->size());
+	m_waterImage1 = m_waterImage1.scaled(event->size());
+	m_waterImage2 = m_waterImage2.scaled(event->size());
 }
 
 void KWaterScreenSaver::paintEvent(QPaintEvent * /*event*/)
 {
 	QPainter painter(this);
-	//painter.drawPixmap(rect(), m_backgroundPixmap);
-	painter.drawImage(rect(), m_waterImages[m_currentWaterImage]);
+	painter.drawPixmap(rect(), m_backgroundPixmap);
+	painter.drawImage(rect(), *m_oldImg);
 	painter.drawText(rect(), Qt::AlignCenter, "Water Screensaver");
 }
 
-void KWaterScreenSaver::initialize()
+void KWaterScreenSaver::mouseMoveEvent(QMouseEvent *event)
 {
+	if (event->buttons() & Qt::LeftButton) {
+		kDebug() << "Mouse drag at" << event->x() << event->y();
+		m_curImg->setPixel(event->x(), event->y(), 255);
+	}
 }
 
 void KWaterScreenSaver::timeout()
 {
-	QImage newImg = m_waterImages[m_currentWaterImage];
-	QImage oldImg = m_waterImages[m_currentWaterImage == 0 ? 1 : 0];
-
-	for (int y = 1; y < newImg.height() - 1; y++) {
-		for (int x = 1; x < newImg.width() - 1; x++) {
-			int value = (oldImg.pixelIndex(x, y - 1) + 
-					oldImg.pixelIndex(x, y + 1) + 
-					oldImg.pixelIndex(x - 1, y) + 
-					oldImg.pixelIndex(x + 1, y)) / 2 - oldImg.pixelIndex(x, y);
-			newImg.setPixel(x, y, value);
-			newImg.setPixel(x, y, newImg.pixelIndex(x, y) - newImg.pixelIndex(x, y) >> 4); // Apply damping
+	for (int y = 1; y < m_curImg->height() - 1; y++) {
+		for (int x = 1; x < m_curImg->width() - 1; x++) {
+			int value = (m_oldImg->pixelIndex(x, y - 1) + 
+					m_oldImg->pixelIndex(x, y + 1) + 
+					m_oldImg->pixelIndex(x - 1, y) + 
+					m_oldImg->pixelIndex(x + 1, y)) / 2 - m_oldImg->pixelIndex(x, y);
+			//kDebug() << "Value" << value << "X:" << x << "Y:" << y;
+			m_curImg->setPixel(x, y, value);
+			m_curImg->setPixel(x, y, m_curImg->pixelIndex(x, y) - m_curImg->pixelIndex(x, y) >> 4); // Apply damping
 		}
 	}
 
 	update();
 	// Flip the pointer to the current water pixmap
-	m_currentWaterImage == 0 ? m_currentWaterImage = 1 : m_currentWaterImage= 0;
+	QImage *tmp = m_curImg;
+	m_curImg = m_oldImg;
+	m_oldImg = tmp;
 }
 
 void KWaterScreenSaver::readSettings()
