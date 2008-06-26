@@ -33,6 +33,7 @@
 #include <QTimer>
 #include <QPixmap>
 #include <QImage>
+#include <QVector>
 #include <kscreensaver.h>
 #include <KDialog>
 
@@ -61,12 +62,13 @@ private:
 	void readSettings();
 
 	QTimer m_timer;					///< The animation timer
-	QPixmap m_desktopPixmap;		///< Stores the current desktop as pixmap
-	QPixmap m_backgroundPixmap;		///< Scaled desktop pixmap
-	QImage m_waterImage1;			///< Used for the water algorithm
-	QImage m_waterImage2;			///< Used for the water algorithm
-	QImage* m_curImg;				///<
-	QImage* m_oldImg;				///<
+	QPixmap m_desktopPixmap;		///< Current desktop
+	QImage m_backgroundImage;		///< Scaled desktop
+	QImage m_waterImage;			///< Water effect paint target
+	QVector<int> m_water1;			///< Used for the water algorithm
+	QVector<int> m_water2;			///< Used for the water algorithm
+	QVector<int> *m_cur;			///< Used for the water algorithm
+	QVector<int> *m_old;			///< Used for the water algorithm
 };
 
 /**

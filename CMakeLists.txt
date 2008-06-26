@@ -6,7 +6,7 @@ include_directories(${KDE4_INCLUDES})
 include(KDE4Defaults)
 #####################
 
-set(kwater.kss_SRCS water.cpp)
+set(kwater.kss_SRCS kwater.cpp)
 
 kde4_add_executable(kwater.kss ${kwater.kss_SRCS})
 
