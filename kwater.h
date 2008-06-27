@@ -30,7 +30,6 @@
 #ifndef KWATER_H
 #define KWATER_H
 
-#include <QTimer>
 #include <QPixmap>
 #include <QImage>
 #include <QVector>
@@ -48,7 +47,6 @@ class KWaterScreenSaver : public KScreenSaver
 
 public:
 	explicit KWaterScreenSaver(WId id);
-	virtual ~KWaterScreenSaver();
 
 protected:
 	void resizeEvent(QResizeEvent *event);
@@ -61,10 +59,11 @@ private slots:
 private:
 	void readSettings();
 
-	QTimer m_timer;					///< The animation timer
 	QPixmap m_desktopPixmap;		///< Current desktop
 	QImage m_backgroundImage;		///< Scaled desktop
 	QImage m_waterImage;			///< Water effect paint target
+	int m_width;
+	int m_height;
 	QVector<int> m_water1;			///< Used for the water algorithm
 	QVector<int> m_water2;			///< Used for the water algorithm
 	QVector<int> *m_cur;			///< Used for the water algorithm
@@ -80,7 +79,7 @@ class KWaterSetup : public KDialog
 
 public:
 	explicit KWaterSetup(QWidget *parent = 0);
-	virtual ~KWaterSetup();
+	~KWaterSetup();
 
 protected:
 	void updateSettings();

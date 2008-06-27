@@ -33,23 +33,20 @@
 #include <QPainter>
 #include <QDesktopWidget>
 #include <QResizeEvent>
+#include <QTimer>
 #include <KApplication>
 #include <KDebug>
 
 KWaterScreenSaver::KWaterScreenSaver(WId id)
 	: KScreenSaver(id)
-	, m_desktopPixmap(QPixmap::grabWindow(KApplication::desktop()->winId()))
 	, m_cur(&m_water1)
 	, m_old(&m_water2)
 {
+	hide();
+	m_desktopPixmap = QPixmap::grabWindow(KApplication::desktop()->winId());
+	show();
 	readSettings();
-	connect(&m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
-	m_timer.start(40);	// 40 -> 25 FPS
-}
-
-KWaterScreenSaver::~KWaterScreenSaver()
-{
-	m_timer.stop();
+	QTimer::singleShot(25, this, SLOT(timeout()));
 }
 
 void KWaterScreenSaver::resizeEvent(QResizeEvent *event)
@@ -71,6 +68,7 @@ void KWaterScreenSaver::paintEvent(QPaintEvent * /*event*/)
 	QVector<int> *tmp = m_cur;
 	m_cur = m_old;
 	m_old = tmp;
+	QTimer::singleShot(25, this, SLOT(timeout()));
 }
 
 void KWaterScreenSaver::mouseMoveEvent(QMouseEvent *event)
@@ -98,8 +96,11 @@ void KWaterScreenSaver::timeout()
 				m_old->value(index + 1) +
 				m_old->value(index - width()) +
 				m_old->value(index + width())) / 2 - m_cur->value(index);
-			value -= value >> 4;
+			value -= value >> 8;
 			m_cur->replace(index, value);
+
+			//int color = m_backgroundImage.pixel(x, y) + value;
+			//m_waterImage.setPixel(x, y, color);
 		}
 	}
 	// Compute transparent surface ray-tracing
